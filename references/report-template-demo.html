@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Acme Corp · VSL Evergreen · Weekly Report March 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--dk:#3D3D3D;--bl:#3B82F6;--lb:#EFF6FF;--wh:#FFFFFF;--mg:#6B7280;--lg:#EBEBED;--gn:#059669;--rd:#EF4444;--yl:#F97316;
+  --font-h:"Inter",system-ui,sans-serif;--font-b:"Inter",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--lg);color:var(--dk);font-family:var(--font-b);font-size:15px;line-height:1.6}
+/* NAV */
+nav{position:sticky;top:24px;z-index:100;padding:0 24px;display:flex;justify-content:center}
+.nav-inner{background:var(--dk);border-radius:16px;padding:0 20px;display:flex;
+  align-items:center;gap:4px;overflow-x:auto;white-space:nowrap;height:52px;
+  box-shadow:0 4px 16px rgba(0,0,0,.18);width:100%;max-width:1320px}
+nav a{color:var(--wh);text-decoration:none;font-size:12px;font-weight:600;
+  padding:6px 14px;border-radius:8px;letter-spacing:.5px;transition:all .2s}
+nav a:hover,nav a.active{background:var(--wh);color:var(--dk)}
+.logo{font-weight:800;font-size:14px;color:var(--wh);margin-right:16px;padding-right:16px;
+  border-right:1px solid rgba(255,255,255,.2);white-space:nowrap}
+/* LAYOUT */
+main{max-width:1320px;margin:0 auto;padding:84px 24px 24px}
+section{margin-bottom:24px;scroll-margin-top:84px}
+h1{font-size:28px;font-weight:800;color:var(--dk)}
+h1 span{color:var(--wh)}
+h2{font-size:19px;font-weight:800;color:var(--dk);margin-bottom:16px;padding-bottom:8px}
+h3{font-size:15px;font-weight:700;color:var(--dk);margin-bottom:10px}
+/* HEADER */
+.header-band{background:var(--dk);border-radius:16px;padding:28px 32px;margin-bottom:28px;
+  display:flex;align-items:center;justify-content:space-between}
+.header-band .titles h1{color:var(--wh);margin-bottom:4px}
+.header-band .titles p{color:rgba(255,255,255,.6);font-size:14px}
+/* KPI CARDS */
+.kpi-row{display:grid;gap:14px;margin-bottom:14px}
+.kpi-row.r4{grid-template-columns:repeat(4,1fr)}
+.kpi-row.r3{grid-template-columns:repeat(3,1fr)}
+.kpi-row.r2{grid-template-columns:repeat(2,1fr)}
+.kpi{background:var(--wh);border-radius:16px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.kpi label{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--mg);text-transform:uppercase}
+.kpi .val{font-size:30px;font-weight:800;color:var(--dk);margin:4px 0 2px}
+.kpi .sub{font-size:12px;color:var(--mg)}
+/* CHARTS */
+.chart-wrap{background:var(--wh);border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.chart-wrap canvas{max-height:280px}
+.charts-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.charts-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+/* TABLES */
+.tbl-wrap{background:var(--wh);border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+th{background:var(--dk);color:var(--wh);padding:10px 12px;text-align:left;font-size:11px;
+  font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+thead tr th:first-child{border-radius:0}
+thead tr th:last-child{border-radius:0}
+td{padding:9px 12px;border-bottom:1px solid #E5E7EB;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--lg)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.good{color:var(--gn);font-weight:700}
+.bad{color:var(--rd);font-weight:700}
+.warn{color:var(--yl);font-weight:700}
+/* INSIGHTS */
+.insight{background:var(--wh);border-left:4px solid var(--bl);border-radius:8px;
+  padding:14px 18px;margin-bottom:14px;font-size:13px;line-height:1.7;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.insight strong{color:var(--bl)}
+.insight-warn{border-left-color:var(--yl)}
+.insight-warn strong{color:var(--yl)}
+.insight-bad{border-left-color:var(--rd)}
+.insight-bad strong{color:var(--rd)}
+/* RECS */
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rec{background:var(--wh);border-radius:16px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+  border-left:4px solid var(--bl)}
+.rec .num-badge{font-size:22px;font-weight:800;color:var(--bl);margin-bottom:4px}
+.rec h4{font-size:14px;font-weight:700;margin-bottom:6px}
+.rec p{font-size:13px;color:var(--mg);line-height:1.6}
+.rec-pause{border-left-color:var(--rd)}
+.rec-pause .num-badge{color:var(--rd)}
+.rec-scale{border-left-color:var(--gn)}
+.rec-scale .num-badge{color:var(--gn)}
+/* FUNNEL */
+.funnel{background:var(--wh);border-radius:16px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
+.funnel-step{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.funnel-bar{height:40px;border-radius:8px;display:flex;align-items:center;padding:0 16px;
+  font-weight:700;font-size:14px;color:var(--wh);min-width:60px;transition:width .5s}
+.funnel-label{font-size:13px;color:var(--mg);min-width:140px}
+.funnel-arrow{text-align:center;color:var(--mg);font-size:18px;margin:4px 0 4px 156px}
+.funnel-rate{font-size:12px;font-weight:700;color:var(--bl);margin-left:8px}
+/* FOOTER */
+footer{text-align:center;padding:24px;color:var(--mg);font-size:12px}
+/* RESPONSIVE */
+@media(max-width:900px){.kpi-row.r4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.charts-2col,.charts-3col,.kpi-row.r3,.kpi-row.r4,.rec-grid{grid-template-columns:1fr}
+  .header-band{flex-direction:column;gap:16px;text-align:center}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <span class="logo">Acme Corp</span>
+    <a href="#summary" class="active">Summary</a>
+    <a href="#campaigns">Campaigns</a>
+    <a href="#ads">Ads</a>
+    <a href="#funnel">Funnel</a>
+    <a href="#daily">Daily Trend</a>
+    <a href="#recs">Recommendations</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- HEADER -->
+<div class="header-band">
+  <div class="titles">
+    <h1>Weekly Report · <span>VSL Evergreen</span></h1>
+    <p>Meta Ads · Data period: Mar 3 – Mar 9, 2026</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: EXECUTIVE SUMMARY -->
+<!-- ============================================================ -->
+<section id="summary">
+<h2>Executive Summary</h2>
+
+<div class="insight">
+  <strong>CPL of €11.20 is 38% below the €18 target.</strong> All three active campaigns are delivering leads within goal. The best-performing ad hit €6.22 CPL this week.
+</div>
+<div class="insight">
+  <strong>Ad Creative A is driving 43% of all leads</strong> at the lowest CPL in the account. It should be scaled immediately before fatigue sets in — frequency is still at 1.8.
+</div>
+<div class="insight-warn insight">
+  <strong>Two ad sets are burning budget with no results:</strong> Audience B (€103, CPL €51) and Audience C (€103, CPL €52) — both should be paused and budget reallocated.
+</div>
+<div class="insight-bad insight">
+  <strong>Pixel under-reporting leads by ~13%.</strong> CRM shows 147 leads; Meta reports 120. Check the Lead event in Events Manager — optimization may be suboptimal as a result.
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-row r4">
+  <div class="kpi"><label>Total Spend</label><div class="val">€1,554</div><div class="sub">6 days · avg €259/day</div></div>
+  <div class="kpi"><label>Leads (CRM)</label><div class="val">147</div><div class="sub">Meta reports 120 · +22.5%</div></div>
+  <div class="kpi"><label>CPL (Real)</label><div class="val">€11.20</div><div class="sub">vs €18 target 🟢 +38%</div></div>
+  <div class="kpi"><label>CTR (Link)</label><div class="val">1.63%</div><div class="sub">Benchmark: >1.5% ✅</div></div>
+</div>
+<div class="kpi-row r4">
+  <div class="kpi"><label>Impressions</label><div class="val">67,472</div><div class="sub">CPM: €23.03</div></div>
+  <div class="kpi"><label>Link Clicks</label><div class="val">1,098</div><div class="sub">CPC: €1.42</div></div>
+  <div class="kpi"><label>LP Views</label><div class="val">739</div><div class="sub">LP View Rate: 67.3%</div></div>
+  <div class="kpi"><label>Conv. Rate</label><div class="val">19.9%</div><div class="sub">LP Views → Leads</div></div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: CAMPAIGNS -->
+<!-- ============================================================ -->
+<section id="campaigns">
+<h2>Campaign Performance</h2>
+
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>Campaign</th><th>Mode</th><th class="num">Spend</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">CTR</th><th class="num">Leads (Meta)</th><th class="num">CPL</th><th class="num">vs Goal</th><th class="num">Leads (CRM)</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Campaign A — Testing ABO</strong></td><td>Evergreen</td>
+  <td class="num">€859</td><td class="num">39,234</td><td class="num">568</td>
+  <td class="num">1.45%</td><td class="num">69</td><td class="num good">€12.46</td>
+  <td class="good">🟢 +31%</td><td class="num">73</td>
+</tr>
+<tr>
+  <td><strong>Campaign B — Scale CBO</strong></td><td>Evergreen</td>
+  <td class="num">€488</td><td class="num">19,489</td><td class="num">310</td>
+  <td class="num">1.59%</td><td class="num">32</td><td class="num warn">€15.26</td>
+  <td class="warn">🟡 +15%</td><td class="num">32</td>
+</tr>
+<tr>
+  <td><strong>Campaign C — AI Actors</strong></td><td>Launch</td>
+  <td class="num">€183</td><td class="num">7,162</td><td class="num">154</td>
+  <td class="num good">2.15%</td><td class="num">19</td><td class="num good">€9.63</td>
+  <td class="good">🟢 +46%</td><td class="num">24</td>
+</tr>
+<tr>
+  <td><strong>Campaign D — Retargeting</strong></td><td>Evergreen</td>
+  <td class="num">€23</td><td class="num">1,587</td><td class="num">66</td>
+  <td class="num good">4.16%</td><td class="num">0</td><td class="num">—</td>
+  <td class="warn">⚠️ No data</td><td class="num">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap"><h3>Spend Distribution</h3><canvas id="chartSpend"></canvas></div>
+  <div class="chart-wrap"><h3>CPL by Campaign</h3><canvas id="chartCPL"></canvas></div>
+</div>
+
+<div class="insight">
+  <strong>Campaign C (AI Actors)</strong> is the most efficient: CPL €9.63 and CTR 2.15%. With only €183 spent (12% of budget), it has significant headroom to scale. CRM records 24 leads vs 19 from Meta (+26%).
+</div>
+<div class="insight-warn insight">
+  <strong>Campaign B (Scale CBO)</strong> has a CPL 23% higher than Campaign A (€15.26 vs €12.46) and zero appointments. Review the CBO budget distribution — the algorithm may be favoring underperforming ad sets.
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: ADS -->
+<!-- ============================================================ -->
+<section id="ads">
+<h2>Ad Creative Analysis</h2>
+
+<h3>🟢 Top Performers — Scale</h3>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>Ad</th><th>Ad Set</th><th class="num">Spend</th><th class="num">Leads (Meta)</th><th class="num">CPL</th><th class="num">Leads (CRM)</th><th class="num">CTR</th><th>Verdict</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Creative — Hook 7</strong></td><td>Broad — Crypto Angle</td>
+  <td class="num">€37</td><td class="num">6</td><td class="num good">€6.22</td><td class="num">6</td><td class="num">1.40%</td>
+  <td class="good">✅ Scale</td>
+</tr>
+<tr>
+  <td><strong>Creative — Hook 1</strong></td><td>Broad — Product Demo</td>
+  <td class="num">€162</td><td class="num">23</td><td class="num good">€7.06</td><td class="num">27</td><td class="num">1.28%</td>
+  <td class="good">✅ Scale</td>
+</tr>
+<tr>
+  <td><strong>Creative — Hook 1 (Scale)</strong></td><td>Broad — Scale CBO</td>
+  <td class="num">€106</td><td class="num">15</td><td class="num good">€7.09</td><td class="num">13</td><td class="num">1.44%</td>
+  <td class="good">✅ Scale</td>
+</tr>
+<tr>
+  <td><strong>AI Actor — Podcast Style</strong></td><td>Broad — Male 30s</td>
+  <td class="num">€25</td><td class="num">3</td><td class="num good">€8.38</td><td class="num">3</td><td class="num good">2.26%</td>
+  <td class="good">✅ Scale</td>
+</tr>
+<tr>
+  <td><strong>Creative — No Hook</strong></td><td>Interest — Real Estate</td>
+  <td class="num">€162</td><td class="num">18</td><td class="num good">€9.02</td><td class="num">26</td><td class="num">1.38%</td>
+  <td class="good">✅ Scale</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3>🔴 Bottom Performers — Pause</h3>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>Ad</th><th>Ad Set</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">Impressions</th><th>Verdict</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Audience B — Hook 1</strong></td><td>Broad — Audience B</td>
+  <td class="num">€103</td><td class="num">2</td><td class="num bad">€51.52</td><td class="num">3,568</td>
+  <td class="bad">🛑 Pause</td>
+</tr>
+<tr>
+  <td><strong>Audience C — Hook 1</strong></td><td>Broad — Audience C</td>
+  <td class="num">€103</td><td class="num">2</td><td class="num bad">€51.34</td><td class="num">3,368</td>
+  <td class="bad">🛑 Pause</td>
+</tr>
+<tr>
+  <td><strong>Creative H11 — Scale</strong></td><td>Broad — Scale CBO</td>
+  <td class="num">€156</td><td class="num">5</td><td class="num bad">€31.23</td><td class="num">6,294</td>
+  <td class="bad">🛑 Pause</td>
+</tr>
+<tr>
+  <td><strong>Creative — No Hook (Broad)</strong></td><td>Broad — General</td>
+  <td class="num">€65</td><td class="num">3</td><td class="num warn">€21.50</td><td class="num">2,649</td>
+  <td class="warn">⚠️ Monitor</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap"><h3>CPL by Ad (Top 10)</h3><canvas id="chartAdCPL"></canvas></div>
+  <div class="chart-wrap"><h3>CRM Leads by Ad</h3><canvas id="chartAdLeads"></canvas></div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: FUNNEL -->
+<!-- ============================================================ -->
+<section id="funnel">
+<h2>Funnel Analysis</h2>
+
+<div class="funnel">
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Impressions</strong></span>
+    <div class="funnel-bar" style="width:100%;background:var(--dk)">67,472</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">CTR 1.63%</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Link Clicks</strong></span>
+    <div class="funnel-bar" style="width:40%;background:#4B5563">1,098</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">67.3% LP View Rate</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>LP Views</strong></span>
+    <div class="funnel-bar" style="width:28%;background:var(--bl)">739</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">19.9% Conv. Rate</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Leads (CRM)</strong></span>
+    <div class="funnel-bar" style="width:16%;background:#3B82F6">147</div>
+  </div>
+</div>
+
+<div class="insight">
+  <strong>The landing page conversion rate of 19.9% is strong</strong> — industry average for this funnel type is 12–15%. The main drop-off is between Link Clicks and LP Views (33% lost before the page loads). Check page load speed, especially on mobile.
+</div>
+<div class="insight-warn insight">
+  <strong>Lead Source Doughnut</strong> shows 92% of leads are coming from Facebook placements. Instagram is underperforming relative to spend share. Consider testing dedicated Instagram placements.
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap">
+    <h3>Lead Source</h3>
+    <canvas id="chartLeadSource"></canvas>
+  </div>
+  <div class="chart-wrap">
+    <h3>Daily CPL Trend</h3>
+    <canvas id="chartDailyCPL"></canvas>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: DAILY TREND -->
+<!-- ============================================================ -->
+<section id="daily">
+<h2>Daily Trend</h2>
+
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>Day</th><th class="num">Spend</th><th class="num">Impressions</th><th class="num">Clicks</th><th class="num">LP Views</th><th class="num">Leads (Meta)</th><th class="num">CPL</th><th class="num">Leads (CRM)</th></tr>
+</thead>
+<tbody>
+<tr><td>Mon Mar 3</td><td class="num">€337</td><td class="num">19,071</td><td class="num">231</td><td class="num">130</td><td class="num">20</td><td class="num warn">€16.86</td><td class="num">34</td></tr>
+<tr><td>Tue Mar 4</td><td class="num">€320</td><td class="num">14,588</td><td class="num">243</td><td class="num">166</td><td class="num">22</td><td class="num warn">€14.53</td><td class="num">23</td></tr>
+<tr><td>Wed Mar 5</td><td class="num">€267</td><td class="num">10,836</td><td class="num">157</td><td class="num">96</td><td class="num">15</td><td class="num warn">€17.82</td><td class="num">22</td></tr>
+<tr><td>Thu Mar 6</td><td class="num">€239</td><td class="num">8,740</td><td class="num">141</td><td class="num">100</td><td class="num">22</td><td class="num good">€10.88</td><td class="num">22</td></tr>
+<tr><td>Fri Mar 7</td><td class="num">€196</td><td class="num">6,883</td><td class="num">154</td><td class="num">114</td><td class="num">25</td><td class="num good">€7.82</td><td class="num">20</td></tr>
+<tr><td>Sat Mar 8</td><td class="num">€195</td><td class="num">7,354</td><td class="num">172</td><td class="num">133</td><td class="num">16</td><td class="num">€12.18</td><td class="num">18</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap"><h3>Spend vs Leads (Daily)</h3><canvas id="chartDaily"></canvas></div>
+  <div class="chart-wrap"><h3>CPL Trend (Daily)</h3><canvas id="chartDailyCPL2"></canvas></div>
+</div>
+
+<div class="insight">
+  <strong>Strong positive trend:</strong> Spend dropped from €337 to €196 while CPL improved from €16.86 to €7.82 on Friday. Meta is optimizing delivery effectively. Friday was the most efficient day — 25 leads at €7.82 CPL.
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: RECOMMENDATIONS -->
+<!-- ============================================================ -->
+<section id="recs">
+<h2>Recommendations</h2>
+
+<div class="rec-grid">
+  <div class="rec rec-pause">
+    <div class="num-badge">01</div>
+    <h4>🛑 Pause Audience B and Audience C ads</h4>
+    <p>Both at CPL >€50 with over 3,000 impressions each. Enough data to call it. Reallocate ~€35/day to top performers.</p>
+  </div>
+  <div class="rec rec-pause">
+    <div class="num-badge">02</div>
+    <h4>🛑 Pause Creative H11 in Scale CBO</h4>
+    <p>CPL €31.23 with €156 spent. The same creative in testing delivers €16.45 CPL. The CBO is not distributing budget efficiently here.</p>
+  </div>
+  <div class="rec rec-scale">
+    <div class="num-badge">03</div>
+    <h4>✅ Scale Campaign C — AI Actors (+20–30%)</h4>
+    <p>CPL €9.63 and CTR 2.15% — best numbers in the account. Currently at ~€30/day with significant headroom. Increase gradually.</p>
+  </div>
+  <div class="rec rec-scale">
+    <div class="num-badge">04</div>
+    <h4>✅ Scale Creative Hook 1 — Product Demo</h4>
+    <p>27 CRM leads, CPL €7.06. Highest lead volume with proven efficiency across the full week. Ready to scale.</p>
+  </div>
+  <div class="rec">
+    <div class="num-badge">05</div>
+    <h4>👀 Monitor Creative Hook 7</h4>
+    <p>CPL €6.22 — lowest in the account — but only €37 spend. Needs more volume to confirm. Early signals are excellent.</p>
+  </div>
+  <div class="rec">
+    <div class="num-badge">06</div>
+    <h4>🔧 Fix pixel under-reporting</h4>
+    <p>Meta reports 120 leads vs 147 in CRM — a 13% gap. Review the Lead event in Events Manager. Meta may be under-optimizing as a result.</p>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Report generated Mar 9, 2026 · Attribution: 7-day click, 1-day view · Meta Ads modeled data post iOS 14.5 · All figures in EUR</p>
+  <p style="margin-top:8px">This report is generated by <a href="https://sucana.ai" style="color:var(--bl);text-decoration:none;font-weight:600">Sucana.ai</a></p>
+</footer>
+
+</main>
+
+<!-- ============================================================ -->
+<!-- CHARTS.JS -->
+<!-- ============================================================ -->
+<script>
+const bl = '#3B82F6', dk = '#1F2937', mg = '#6B7280', gn = '#059669', rd = '#EF4444', yl = '#F97316', lb = '#EFF6FF';
+
+// Spend Distribution (Doughnut)
+new Chart(document.getElementById('chartSpend'),{
+  type:'doughnut',
+  data:{
+    labels:['Campaign A — Testing','Campaign B — Scale','Campaign C — AI Actors','Campaign D — Retargeting'],
+    datasets:[{data:[859,488,183,23],
+      backgroundColor:[bl,'#60A5FA','#93C5FD',mg],borderWidth:0}]
+  },
+  options:{plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}},cutout:'60%'}
+});
+
+// CPL by Campaign (Horizontal Bar)
+new Chart(document.getElementById('chartCPL'),{
+  type:'bar',
+  data:{
+    labels:['Campaign C — AI Actors','Campaign A — Testing','Campaign B — Scale'],
+    datasets:[{label:'CPL (€)',data:[9.63,12.46,15.26],
+      backgroundColor:[gn,bl,yl],borderRadius:6}]
+  },
+  options:{indexAxis:'y',plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{callback:v=>'€'+v}},y:{grid:{display:false}}}}
+});
+
+// CPL by Ad (Horizontal Bar)
+new Chart(document.getElementById('chartAdCPL'),{
+  type:'bar',
+  data:{
+    labels:['Hook 7','Hook 1 (Demo)','Hook 1 (Scale)','AI Podcast','No Hook (RE)','AI Actor 30s','Hook 4','H11 (Test)','No Hook (Broad)','H11 (Scale)'],
+    datasets:[{label:'CPL (€)',data:[6.22,7.06,7.09,8.38,9.02,9.34,11.74,16.45,21.50,31.23],
+      backgroundColor:[6.22,7.06,7.09,8.38,9.02,9.34,11.74,16.45,21.50,31.23].map(v=>
+        v<=10?gn:v<=15?bl:v<=25?yl:rd),borderRadius:4}]
+  },
+  options:{indexAxis:'y',plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{callback:v=>'€'+v}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+});
+
+// CRM Leads by Ad (Vertical Bar)
+new Chart(document.getElementById('chartAdLeads'),{
+  type:'bar',
+  data:{
+    labels:['Hook 1 (Demo)','No Hook (RE)','AI Actor 30s','H11 (Test)','Hook 1 (Scale)','Hook 4','Hook 7','AI Podcast','Aud. C','Aud. B'],
+    datasets:[{label:'CRM Leads',data:[27,26,20,19,13,8,6,3,3,2],
+      backgroundColor:[bl,bl,bl,'#3B82F6','#3B82F6','#60A5FA','#60A5FA','#93C5FD','#93C5FD',mg],borderRadius:4}]
+  },
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#E5E7EB'},beginAtZero:true}}}
+});
+
+// Lead Source (Doughnut)
+new Chart(document.getElementById('chartLeadSource'),{
+  type:'doughnut',
+  data:{
+    labels:['Facebook Feed','Instagram Feed','Facebook Stories','Direct / Other','Google Ads'],
+    datasets:[{data:[136,4,4,2,1],backgroundColor:[bl,'#60A5FA',mg,gn,yl],borderWidth:0}]
+  },
+  options:{plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}},cutout:'55%'}
+});
+
+// Daily CPL (Bar — in funnel section)
+new Chart(document.getElementById('chartDailyCPL'),{
+  type:'bar',
+  data:{
+    labels:['Mar 3','Mar 4','Mar 5','Mar 6','Mar 7','Mar 8'],
+    datasets:[{label:'CPL (€)',data:[16.86,14.53,17.82,10.88,7.82,12.18],
+      backgroundColor:['#3B82F6','#3B82F6',yl,bl,gn,bl],borderRadius:6}]
+  },
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false}},y:{grid:{color:'#E5E7EB'},ticks:{callback:v=>'€'+v},beginAtZero:true}}}
+});
+
+// Daily Spend vs Leads (Dual-axis Line)
+new Chart(document.getElementById('chartDaily'),{
+  type:'line',
+  data:{
+    labels:['Mar 3','Mar 4','Mar 5','Mar 6','Mar 7','Mar 8'],
+    datasets:[
+      {label:'Spend (€)',data:[337,320,267,239,196,195],
+        borderColor:dk,backgroundColor:'rgba(31,41,55,.1)',fill:true,tension:.3,yAxisID:'y',borderWidth:2,pointRadius:4},
+      {label:'CRM Leads',data:[34,23,22,22,20,18],
+        borderColor:bl,backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.3,yAxisID:'y1',borderWidth:2,pointRadius:4}
+    ]
+  },
+  options:{plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
+    scales:{
+      y:{position:'left',title:{display:true,text:'Spend (€)'},grid:{color:'#E5E7EB'}},
+      y1:{position:'right',title:{display:true,text:'Leads'},grid:{display:false}},
+      x:{grid:{display:false}}
+    }}
+});
+
+// Daily CPL Trend (Bar — in daily section)
+new Chart(document.getElementById('chartDailyCPL2'),{
+  type:'bar',
+  data:{
+    labels:['Mar 3','Mar 4','Mar 5','Mar 6','Mar 7','Mar 8'],
+    datasets:[{label:'CPL (€)',data:[16.86,14.53,17.82,10.88,7.82,12.18],
+      backgroundColor:['#3B82F6','#3B82F6',yl,bl,gn,bl],borderRadius:6}]
+  },
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false}},y:{grid:{color:'#E5E7EB'},ticks:{callback:v=>'€'+v},beginAtZero:true}}}
+});
+</script>
+</body>
+</html>

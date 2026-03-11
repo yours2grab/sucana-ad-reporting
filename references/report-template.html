@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Juan Vidal · VSL Evergreen · Análisis Marzo 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--dk:#3D3D3D;--bl:#3B82F6;--lb:#EFF6FF;--wh:#FFFFFF;--mg:#6B7280;--lg:#EBEBED;--gn:#059669;--rd:#EF4444;--yl:#F97316;
+  --font-h:"Inter",system-ui,sans-serif;--font-b:"Inter",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--lg);color:var(--dk);font-family:var(--font-b);font-size:15px;line-height:1.6}
+/* NAV */
+nav{position:sticky;top:24px;z-index:100;padding:0 24px;display:flex;justify-content:center}
+.nav-inner{background:var(--dk);border-radius:16px;padding:0 20px;display:flex;
+  align-items:center;gap:4px;overflow-x:auto;white-space:nowrap;height:52px;
+  box-shadow:0 4px 16px rgba(0,0,0,.18);width:100%;max-width:1320px}
+nav a{color:var(--wh);text-decoration:none;font-size:12px;font-weight:600;
+  padding:6px 14px;border-radius:8px;letter-spacing:.5px;transition:all .2s}
+nav a:hover,nav a.active{background:var(--wh);color:var(--dk)}
+.logo{font-weight:800;font-size:14px;color:var(--wh);margin-right:16px;padding-right:16px;
+  border-right:1px solid rgba(255,255,255,.2);white-space:nowrap}
+/* LAYOUT */
+main{max-width:1320px;margin:0 auto;padding:84px 24px 24px}
+section{margin-bottom:24px;scroll-margin-top:84px}
+h1{font-size:28px;font-weight:800;color:var(--dk)}
+h1 span{color:var(--wh)}
+h2{font-size:19px;font-weight:800;color:var(--dk);margin-bottom:16px;padding-bottom:8px}
+h3{font-size:15px;font-weight:700;color:var(--dk);margin-bottom:10px}
+/* HEADER */
+.header-band{background:var(--dk);border-radius:16px;padding:28px 32px;margin-bottom:28px;
+  display:flex;align-items:center;justify-content:space-between}
+.header-band .titles h1{color:var(--wh);margin-bottom:4px}
+.header-band .titles p{color:rgba(255,255,255,.6);font-size:14px}
+/* KPI CARDS */
+.kpi-row{display:grid;gap:14px;margin-bottom:14px}
+.kpi-row.r4{grid-template-columns:repeat(4,1fr)}
+.kpi-row.r3{grid-template-columns:repeat(3,1fr)}
+.kpi-row.r2{grid-template-columns:repeat(2,1fr)}
+.kpi{background:var(--wh);border-radius:16px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.kpi label{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--mg);text-transform:uppercase}
+.kpi .val{font-size:30px;font-weight:800;color:var(--dk);margin:4px 0 2px}
+.kpi .sub{font-size:12px;color:var(--mg)}
+/* CHARTS */
+.chart-wrap{background:var(--wh);border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.chart-wrap canvas{max-height:280px}
+.charts-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.charts-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+/* TABLES */
+.tbl-wrap{background:var(--wh);border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+th{background:var(--dk);color:var(--wh);padding:10px 12px;text-align:left;font-size:11px;
+  font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+thead tr th:first-child{border-radius:0}
+thead tr th:last-child{border-radius:0}
+td{padding:9px 12px;border-bottom:1px solid #E5E7EB;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--lg)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.good{color:var(--gn);font-weight:700}
+.bad{color:var(--rd);font-weight:700}
+.warn{color:var(--yl);font-weight:700}
+/* INSIGHTS */
+.insight{background:var(--wh);border-left:4px solid var(--bl);border-radius:8px;
+  padding:14px 18px;margin-bottom:14px;font-size:13px;line-height:1.7;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.insight strong{color:var(--bl)}
+.insight-warn{border-left-color:var(--yl)}
+.insight-warn strong{color:var(--yl)}
+.insight-bad{border-left-color:var(--rd)}
+.insight-bad strong{color:var(--rd)}
+/* RECS */
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rec{background:var(--wh);border-radius:16px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+  border-left:4px solid var(--bl)}
+.rec .num-badge{font-size:22px;font-weight:800;color:var(--bl);margin-bottom:4px}
+.rec h4{font-size:14px;font-weight:700;margin-bottom:6px}
+.rec p{font-size:13px;color:var(--mg);line-height:1.6}
+.rec-pause{border-left-color:var(--rd)}
+.rec-pause .num-badge{color:var(--rd)}
+.rec-scale{border-left-color:var(--gn)}
+.rec-scale .num-badge{color:var(--gn)}
+/* FUNNEL */
+.funnel{background:var(--wh);border-radius:16px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
+.funnel-step{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.funnel-bar{height:40px;border-radius:8px;display:flex;align-items:center;padding:0 16px;
+  font-weight:700;font-size:14px;color:var(--wh);min-width:60px;transition:width .5s}
+.funnel-label{font-size:13px;color:var(--mg);min-width:140px}
+.funnel-arrow{text-align:center;color:var(--mg);font-size:18px;margin:4px 0 4px 156px}
+.funnel-rate{font-size:12px;font-weight:700;color:var(--bl);margin-left:8px}
+/* FOOTER */
+footer{text-align:center;padding:24px;color:var(--mg);font-size:12px}
+/* RESPONSIVE */
+@media(max-width:900px){.kpi-row.r4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.charts-2col,.charts-3col,.kpi-row.r3,.kpi-row.r4,.rec-grid{grid-template-columns:1fr}
+  .header-band{flex-direction:column;gap:16px;text-align:center}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <span class="logo">Juan Vidal</span>
+    <a href="#resumen" class="active">Resumen</a>
+    <a href="#campanas">Campañas</a>
+    <a href="#anuncios">Anuncios</a>
+    <a href="#embudo">Embudo</a>
+    <a href="#diario">Evolución</a>
+    <a href="#recs">Recomendaciones</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- HEADER -->
+<div class="header-band">
+  <div class="titles">
+    <h1>Análisis Semanal · <span>VSL Evergreen</span></h1>
+    <p>Meta Ads · Embudo Lead → Appointment → Compra</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: RESUMEN EJECUTIVO -->
+<!-- ============================================================ -->
+<section id="resumen">
+<h2>📊 Resumen Ejecutivo</h2>
+
+<div class="insight">
+  <strong>Meta infra-reporta leads un ~13%.</strong> El pixel registra 120 leads pero la base de datos real tiene 147 registros (136 de Facebook). Recomendable revisar configuración de eventos en Events Manager.
+</div>
+<div class="insight">
+  <strong>3 ventas en los primeros 9 días de marzo.</strong> Todas cerradas por Cárdenas. Las 3 tenían appointment confirmado → tasa de cierre appointment→venta del 27,3%. Mediana histórica de maduración: 19 días, así que se esperan más ventas de los leads de esta semana.
+</div>
+<div class="insight">
+  <strong>Dos ad sets quemando presupuesto:</strong> INQUILINOS (€103, CPL €51) y DIV_INTERNACIONAL (€103, CPL €52) — candidatos a pausar inmediatamente.
+</div>
+<div class="insight">
+  <strong>Contexto: gran lanzamiento en Feb 26 con 133 ventas.</strong> Marzo es la transición a Evergreen. Las 3 ventas en 9 días (ritmo ~10/mes) son coherentes con el modo evergreen post-lanzamiento.
+</div>
+
+<!-- KPIs principales -->
+<div class="kpi-row r4">
+  <div class="kpi"><label>Gasto Total</label><div class="val">€1.554</div><div class="sub">6 días · media €259/día</div></div>
+  <div class="kpi"><label>Leads Reales (BBDD)</label><div class="val blue">147</div><div class="sub">Meta reporta 120 · +22,5%</div></div>
+  <div class="kpi"><label>CPL Real</label><div class="val">€11,18</div><div class="sub">CPL Meta: €12,95</div></div>
+  <div class="kpi"><label>CTR (Link)</label><div class="val">1,63%</div><div class="sub">Benchmark: >1,5% ✅</div></div>
+</div>
+<div class="kpi-row r4">
+  <div class="kpi"><label>Impresiones</label><div class="val">67.472</div><div class="sub">CPM: €23,03</div></div>
+  <div class="kpi"><label>Clics en Enlace</label><div class="val">1.098</div><div class="sub">CPC: €1,42</div></div>
+  <div class="kpi"><label>Appointments</label><div class="val blue">13</div><div class="sub">11 confirmados · 2 cancelados</div></div>
+  <div class="kpi"><label>Coste / Appointment</label><div class="val">€119,55</div><div class="sub">Confirmado: €141,28</div></div>
+</div>
+<div class="kpi-row r4">
+  <div class="kpi"><label>Ventas Marzo</label><div class="val blue">3</div><div class="sub">Todas por Cárdenas</div></div>
+  <div class="kpi"><label>Coste / Venta (periodo)</label><div class="val">€518</div><div class="sub">Gasto periodo / ventas</div></div>
+  <div class="kpi"><label>Appt → Venta</label><div class="val">27,3%</div><div class="sub">3 ventas / 11 appts confirm.</div></div>
+  <div class="kpi"><label>Maduración (mediana hist.)</label><div class="val">19 d</div><div class="sub">Media: 127d · Rango: 0–1.910d</div></div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: CAMPAÑAS -->
+<!-- ============================================================ -->
+<section id="campanas">
+<h2>📁 Rendimiento por Campaña</h2>
+
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>Campaña</th><th class="num">Gasto</th><th class="num">Impr.</th><th class="num">Clicks</th><th class="num">CTR</th><th class="num">Leads Meta</th><th class="num">CPL</th><th class="num">Leads BBDD</th><th class="num">Appts Meta</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>TF_TESTING_ABO</strong></td>
+  <td class="num">€859,50</td><td class="num">39.234</td><td class="num">568</td>
+  <td class="num">1,45%</td><td class="num">69</td><td class="num">€12,46</td>
+  <td class="num">73</td><td class="num">4</td>
+</tr>
+<tr>
+  <td><strong>TF_ESCALADO_CBO</strong></td>
+  <td class="num">€488,24</td><td class="num">19.489</td><td class="num">310</td>
+  <td class="num">1,59%</td><td class="num">32</td><td class="num">€15,26</td>
+  <td class="num">32</td><td class="num">0</td>
+</tr>
+<tr>
+  <td><strong>Actores IA</strong></td>
+  <td class="num">€183,02</td><td class="num">7.162</td><td class="num">154</td>
+  <td class="num good">2,15%</td><td class="num">19</td><td class="num good">€9,63</td>
+  <td class="num">24</td><td class="num">0</td>
+</tr>
+<tr>
+  <td><strong>TC_RT_LLAMADA</strong></td>
+  <td class="num">€23,34</td><td class="num">1.587</td><td class="num">66</td>
+  <td class="num good">4,16%</td><td class="num">0</td><td class="num">—</td>
+  <td class="num">0</td><td class="num">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap"><h3>Distribución de Gasto</h3><canvas id="chartGasto"></canvas></div>
+  <div class="chart-wrap"><h3>CPL por Campaña</h3><canvas id="chartCPL"></canvas></div>
+</div>
+
+<div class="insight">
+  <strong>Actores IA</strong> es la campaña más eficiente: CPL €9,63 y CTR 2,15%. Con solo €183 de gasto (12% del total), es la principal candidata a escalar. Además, la BBDD registra 24 leads reales vs 19 de Meta (+26%).
+</div>
+<div class="insight-warn insight">
+  <strong>TF_ESCALADO_CBO</strong> tiene un CPL un 23% más caro que TF_TESTING (€15,26 vs €12,46) y 0 appointments Meta. Revisar la distribución de presupuesto del CBO.
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: ANUNCIOS -->
+<!-- ============================================================ -->
+<section id="anuncios">
+<h2>🎨 Análisis de Anuncios</h2>
+
+<h3>🟢 Top Performers — Escalar</h3>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>Anuncio</th><th>Ad Set</th><th class="num">Gasto</th><th class="num">Leads Meta</th><th class="num">CPL</th><th class="num">Leads BBDD</th><th class="num">CTR</th><th>Decisión</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>UVT_CRYPTO_H7</strong></td><td>BROAD UVT_CRYPTO</td>
+  <td class="num">€37,33</td><td class="num">6</td><td class="num good">€6,22</td><td class="num">6</td><td class="num">1,40%</td>
+  <td class="good">✅ Escalar</td>
+</tr>
+<tr>
+  <td><strong>PDP - H1</strong></td><td>BROAD PDP_SIN_HOOK</td>
+  <td class="num">€162,41</td><td class="num">23</td><td class="num good">€7,06</td><td class="num">27</td><td class="num">1,28%</td>
+  <td class="good">✅ Escalar</td>
+</tr>
+<tr>
+  <td><strong>UVT_CRYPTO_H1</strong></td><td>BROAD UVT (Escalado)</td>
+  <td class="num">€106,28</td><td class="num">15</td><td class="num good">€7,09</td><td class="num">13</td><td class="num">1,44%</td>
+  <td class="good">✅ Escalar</td>
+</tr>
+<tr>
+  <td><strong>Hombre Podcast IA</strong></td><td>BROAD Hombre 30s</td>
+  <td class="num">€25,13</td><td class="num">3</td><td class="num good">€8,38</td><td class="num">3</td><td class="num good">2,26%</td>
+  <td class="good">✅ Escalar</td>
+</tr>
+<tr>
+  <td><strong>INR - Sin hook</strong></td><td>INT INV INMOB (Testing)</td>
+  <td class="num">€162,40</td><td class="num">18</td><td class="num good">€9,02</td><td class="num">26</td><td class="num">1,38%</td>
+  <td class="good">✅ Escalar</td>
+</tr>
+<tr>
+  <td><strong>Hombre IA 30s</strong></td><td>Int Inversión</td>
+  <td class="num">€74,72</td><td class="num">8</td><td class="num good">€9,34</td><td class="num">20</td><td class="num good">2,45%</td>
+  <td class="good">✅ Escalar</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3>🔴 Bottom Performers — Pausar</h3>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>Anuncio</th><th>Ad Set</th><th class="num">Gasto</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">Impr.</th><th>Decisión</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>DIV_INTERNACIONAL_H1</strong></td><td>BROAD DIV_INT</td>
+  <td class="num">€103,03</td><td class="num">2</td><td class="num bad">€51,52</td><td class="num">3.568</td>
+  <td class="bad">🛑 Pausar</td>
+</tr>
+<tr>
+  <td><strong>INQUILINOS_H1</strong></td><td>BROAD INQUILINOS</td>
+  <td class="num">€102,69</td><td class="num">2</td><td class="num bad">€51,34</td><td class="num">3.368</td>
+  <td class="bad">🛑 Pausar</td>
+</tr>
+<tr>
+  <td><strong>INR_H11_CCTAS…</strong></td><td>BROAD INR (Escalado)</td>
+  <td class="num">€156,13</td><td class="num">5</td><td class="num bad">€31,23</td><td class="num">6.294</td>
+  <td class="bad">🛑 Pausar</td>
+</tr>
+<tr>
+  <td><strong>INR - Sin hook</strong></td><td>BROAD INR</td>
+  <td class="num">€64,51</td><td class="num">3</td><td class="num warn">€21,50</td><td class="num">2.649</td>
+  <td class="warn">⚠️ Monitorizar</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap"><h3>CPL por Anuncio (Top 10)</h3><canvas id="chartAdCPL"></canvas></div>
+  <div class="chart-wrap"><h3>Leads Reales por Anuncio (BBDD)</h3><canvas id="chartAdLeads"></canvas></div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: EMBUDO -->
+<!-- ============================================================ -->
+<section id="embudo">
+<h2>🔄 Análisis de Embudo</h2>
+
+<div class="funnel">
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Impresiones</strong></span>
+    <div class="funnel-bar" style="width:100%;background:var(--dk)">67.472</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">CTR 1,63%</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Clics Enlace</strong></span>
+    <div class="funnel-bar" style="width:40%;background:#4B5563">1.098</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">67,3% LP View Rate</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Visitas LP</strong></span>
+    <div class="funnel-bar" style="width:28%;background:var(--bl)">739</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">19,9% Conv. Rate</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Leads (BBDD)</strong></span>
+    <div class="funnel-bar" style="width:16%;background:#3B82F6">147</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">~9,4% Lead→Appt *</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Appointments</strong></span>
+    <div class="funnel-bar" style="width:8%;background:var(--gn)">13</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">84,6% Confirmación</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Confirmados</strong></span>
+    <div class="funnel-bar" style="width:7%;background:#15803D">11</div>
+  </div>
+  <div class="funnel-arrow">↓ <span class="funnel-rate">27,3% Close Rate</span></div>
+  <div class="funnel-step">
+    <span class="funnel-label"><strong>Ventas</strong></span>
+    <div class="funnel-bar" style="width:4%;background:var(--gn)">3</div>
+  </div>
+</div>
+
+<div class="insight">
+  <strong>* Nota sobre atribución:</strong> Los appointments y ventas de marzo pueden provenir de leads generados semanas o meses antes. La mediana histórica de maduración es 19 días. El 40,7% de las ventas ocurren en los primeros 14 días, pero el 24,6% tarda más de 90 días.
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap">
+    <h3>Appointments por Calendario</h3>
+    <canvas id="chartApptsCal"></canvas>
+  </div>
+  <div class="chart-wrap">
+    <h3>Origen de Leads (Fuente)</h3>
+    <canvas id="chartLeadSource"></canvas>
+  </div>
+</div>
+
+<div class="tbl-wrap">
+<h3>Detalle de Appointments Confirmados (Marzo) + Ventas</h3>
+<table>
+<thead>
+<tr><th>Fecha Appt</th><th>Contacto</th><th>Calendario</th><th>Closer</th><th>Estado</th><th>Venta</th></tr>
+</thead>
+<tbody>
+<tr><td>Mar 03</td><td>Pablo Ortega Sánchez</td><td>Sueldo Creciente</td><td>Juan Á. de la Cruz</td><td class="good">Confirmado</td><td class="good">✅ Venta 04-03 (Webinar intensivo)</td></tr>
+<tr><td>Mar 05</td><td>Juan Calleja Vilar</td><td>Sueldo Creciente</td><td>Juan Á. de la Cruz</td><td class="good">Confirmado</td><td class="good">✅ Venta 06-03 (Webinar intensivo)</td></tr>
+<tr><td>Mar 05</td><td>Manuel Beiro Martínez</td><td>Aristócratas VSL</td><td>Juan C. Cárdenas</td><td class="good">Confirmado</td><td class="good">✅ Venta 07-03 (Vsl)</td></tr>
+<tr><td>Mar 05</td><td>Elizabeth Cosme Laura</td><td>Aristócratas VSL</td><td>Juan C. Cárdenas</td><td class="good">Confirmado</td><td>—</td></tr>
+<tr><td>Mar 06</td><td>Domingo A. Alhama y Roig</td><td>Aristócratas VSL</td><td>Juan C. Cárdenas</td><td class="good">Confirmado</td><td>—</td></tr>
+<tr><td>Mar 09</td><td>Nora Leonardo Benito</td><td>Aristócratas VSL</td><td>Juan C. Cárdenas</td><td class="good">Confirmado</td><td>— (reciente)</td></tr>
+<tr><td>Mar 09</td><td>Adria Garriga del Amo</td><td>Aristócratas VSL</td><td>Juan C. Cárdenas</td><td class="good">Confirmado</td><td>— (reciente)</td></tr>
+<tr><td>Mar 09</td><td>Amalia Serna Espinosa</td><td>Sueldo Creciente</td><td>Juan Á. de la Cruz</td><td class="good">Confirmado</td><td>— (reciente)</td></tr>
+<tr><td>Mar 09</td><td>Alfredo Fuertes Zaera</td><td>Sueldo Creciente</td><td>Juan Á. de la Cruz</td><td class="good">Confirmado</td><td>— (reciente)</td></tr>
+<tr><td>Mar 09</td><td>Fernando Martinez</td><td>Sueldo Creciente</td><td>Juan Á. de la Cruz</td><td class="good">Confirmado</td><td>— (reciente)</td></tr>
+<tr><td>Mar 09</td><td>Jesus Gomez</td><td>Sueldo Creciente</td><td>Juan Á. de la Cruz</td><td class="good">Confirmado</td><td>— (reciente)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="insight">
+  <strong>Las 3 ventas provienen de los primeros appointments (Mar 3-5).</strong> Los 6 appointments del 9 de marzo son demasiado recientes para haber convertido aún. Si se mantiene el close rate del 27%, podrían generar 1-2 ventas adicionales en los próximos días.
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap">
+    <h3>Días de Maduración (Lead → Venta) — Histórico</h3>
+    <canvas id="chartMaturation"></canvas>
+  </div>
+  <div class="chart-wrap">
+    <h3>Ventas por Mes (Últimos 3 meses)</h3>
+    <canvas id="chartSalesMonth"></canvas>
+  </div>
+</div>
+
+<div class="tbl-wrap">
+<h3>Histórico de Ventas por Closer</h3>
+<table>
+<thead>
+<tr><th>Closer</th><th class="num">Ventas Totales</th><th class="num">% del Total</th><th class="num">Ventas Marzo 26</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Cárdenas</strong></td><td class="num">291</td><td class="num">53,7%</td><td class="num good">3</td></tr>
+<tr><td><strong>Virginia</strong></td><td class="num">93</td><td class="num">17,2%</td><td class="num">0</td></tr>
+<tr><td><strong>Compra directa</strong></td><td class="num">78</td><td class="num">14,4%</td><td class="num">0</td></tr>
+<tr><td><strong>Juan de la Cruz</strong></td><td class="num">60</td><td class="num">11,1%</td><td class="num">0</td></tr>
+<tr><td><strong>Carlos</strong></td><td class="num">20</td><td class="num">3,7%</td><td class="num">0</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: EVOLUCIÓN DIARIA -->
+<!-- ============================================================ -->
+<section id="diario">
+<h2>📈 Evolución Diaria</h2>
+
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr><th>Día</th><th class="num">Gasto</th><th class="num">Impr.</th><th class="num">Clicks</th><th class="num">LP Views</th><th class="num">Leads Meta</th><th class="num">CPL</th><th class="num">Leads BBDD</th></tr>
+</thead>
+<tbody>
+<tr><td>Mar 03 (Lu)</td><td class="num">€337,15</td><td class="num">19.071</td><td class="num">231</td><td class="num">130</td><td class="num">20</td><td class="num">€16,86</td><td class="num">34</td></tr>
+<tr><td>Mar 04 (Ma)</td><td class="num">€319,67</td><td class="num">14.588</td><td class="num">243</td><td class="num">166</td><td class="num">22</td><td class="num">€14,53</td><td class="num">23</td></tr>
+<tr><td>Mar 05 (Mi)</td><td class="num">€267,33</td><td class="num">10.836</td><td class="num">157</td><td class="num">96</td><td class="num">15</td><td class="num">€17,82</td><td class="num">22</td></tr>
+<tr><td>Mar 06 (Ju)</td><td class="num">€239,42</td><td class="num">8.740</td><td class="num">141</td><td class="num">100</td><td class="num">22</td><td class="num good">€10,88</td><td class="num">22</td></tr>
+<tr><td>Mar 07 (Vi)</td><td class="num">€195,59</td><td class="num">6.883</td><td class="num">154</td><td class="num">114</td><td class="num">25</td><td class="num good">€7,82</td><td class="num">20</td></tr>
+<tr><td>Mar 08 (Sá)</td><td class="num">€194,94</td><td class="num">7.354</td><td class="num">172</td><td class="num">133</td><td class="num">16</td><td class="num">€12,18</td><td class="num">18</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="charts-2col">
+  <div class="chart-wrap"><h3>Gasto vs Leads (Diario)</h3><canvas id="chartDaily"></canvas></div>
+  <div class="chart-wrap"><h3>CPL Diario (Meta)</h3><canvas id="chartDailyCPL"></canvas></div>
+</div>
+
+<div class="insight">
+  <strong>Tendencia positiva:</strong> El gasto bajó de €337 a €195 pero el CPL mejoró significativamente (de €16,86 a €7,82 el viernes). Meta está optimizando el delivery. El viernes fue el mejor día en eficiencia con 25 leads a €7,82.
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION: RECOMENDACIONES -->
+<!-- ============================================================ -->
+<section id="recs">
+<h2>🎯 Recomendaciones</h2>
+
+<div class="rec-grid">
+  <div class="rec rec-pause">
+    <div class="num-badge">01</div>
+    <h4>🛑 Pausar INQUILINOS_H1 y DIV_INTERNACIONAL_H1</h4>
+    <p>Ambos con CPL >€50 y más de 3.000 impresiones cada uno. Datos suficientes para decidir en Evergreen. Reasignar ~€35/día a los ganadores.</p>
+  </div>
+  <div class="rec rec-pause">
+    <div class="num-badge">02</div>
+    <h4>🛑 Pausar INR_H11 en Escalado (CBO)</h4>
+    <p>CPL €31,23 con €156 gastados. El mismo anuncio en Testing rinde mejor (CPL €16,45). El CBO no está distribuyendo bien aquí.</p>
+  </div>
+  <div class="rec rec-scale">
+    <div class="num-badge">03</div>
+    <h4>✅ Escalar Actores IA (+20-30%)</h4>
+    <p>CPL €9,63 y CTR 2,15% — los mejores números globales. Solo €30/día actualmente. Tiene margen de crecimiento significativo.</p>
+  </div>
+  <div class="rec rec-scale">
+    <div class="num-badge">04</div>
+    <h4>✅ Escalar PDP-H1</h4>
+    <p>27 leads reales, CPL €7,06. Mayor volumen de leads en la BBDD con eficiencia probada a lo largo de toda la semana.</p>
+  </div>
+  <div class="rec">
+    <div class="num-badge">05</div>
+    <h4>👀 Monitorizar UVT_CRYPTO_H7</h4>
+    <p>CPL €6,22, el más bajo de todos, pero con solo €37 de gasto. Necesita más volumen para confirmar, pero los datos iniciales son excelentes.</p>
+  </div>
+  <div class="rec">
+    <div class="num-badge">06</div>
+    <h4>⚡ Aumentar RT_LLAMADA</h4>
+    <p>Solo €23 en 6 días con CTR 4,16%. Si hay audiencia warm suficiente, subir presupuesto para empujar más appointments directos.</p>
+  </div>
+  <div class="rec rec-scale">
+    <div class="num-badge">07</div>
+    <h4>📊 Seguimiento de ventas pendientes</h4>
+    <p>6 appointments del 9 de marzo sin resultado aún. Con el close rate del 27%, se esperan 1-2 ventas adicionales. Hacer seguimiento con los closers en los próximos 5-7 días.</p>
+  </div>
+  <div class="rec">
+    <div class="num-badge">08</div>
+    <h4>🔧 Verificar tracking de pixel</h4>
+    <p>Meta reporta 120 leads vs 131+ en BBDD de Facebook. Discrepancia del 13%. Revisar evento Lead en Events Manager para asegurar la optimización correcta.</p>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Informe generado el 9 de marzo de 2026 · Atribución: 7-day click, 1-day view · Datos Meta Ads modelados post iOS 14.5</p>
+</footer>
+
+</main>
+
+<!-- ============================================================ -->
+<!-- CHARTS.JS -->
+<!-- ============================================================ -->
+<script>
+const C = Chart;
+const bl = '#2563EB', dk = '#1F2937', mg = '#6B7280', gn = '#16A34A', rd = '#DC2626', yl = '#F59E0B', lb = '#DBEAFE';
+
+// --- Gasto por Campaña (Doughnut) ---
+new C(document.getElementById('chartGasto'),{
+  type:'doughnut',
+  data:{
+    labels:['TF_TESTING_ABO','TF_ESCALADO_CBO','Actores IA','TC_RT_LLAMADA'],
+    datasets:[{data:[859.50,488.24,183.02,23.34],
+      backgroundColor:[bl,'#3B82F6','#60A5FA','#93C5FD'],borderWidth:0}]
+  },
+  options:{plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}},cutout:'60%'}
+});
+
+// --- CPL por Campaña (Bar) ---
+new C(document.getElementById('chartCPL'),{
+  type:'bar',
+  data:{
+    labels:['Actores IA','TF_TESTING','TF_ESCALADO'],
+    datasets:[{label:'CPL (€)',data:[9.63,12.46,15.26],
+      backgroundColor:[gn,bl,yl],borderRadius:6}]
+  },
+  options:{indexAxis:'y',plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{callback:v=>'€'+v}},y:{grid:{display:false}}}}
+});
+
+// --- CPL por Anuncio (Bar) ---
+new C(document.getElementById('chartAdCPL'),{
+  type:'bar',
+  data:{
+    labels:['UVT_H7','PDP-H1','UVT_H1(E)','IA Podcast','INR s/hook(T)','IA 30s','UVT_H4','INR_H11(T)','INR s/hook(B)','INR_H11(E)'],
+    datasets:[{label:'CPL (€)',data:[6.22,7.06,7.09,8.38,9.02,9.34,11.74,16.45,21.50,31.23],
+      backgroundColor:function(){
+        const colors = [];
+        [6.22,7.06,7.09,8.38,9.02,9.34,11.74,16.45,21.50,31.23].forEach(v=>{
+          if(v<=10) colors.push(gn);
+          else if(v<=15) colors.push(bl);
+          else if(v<=25) colors.push(yl);
+          else colors.push(rd);
+        });
+        return colors;
+      }(),borderRadius:4}]
+  },
+  options:{indexAxis:'y',plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{callback:v=>'€'+v}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+});
+
+// --- Leads Reales por Anuncio (Bar) ---
+new C(document.getElementById('chartAdLeads'),{
+  type:'bar',
+  data:{
+    labels:['PDP-H1','INR s/hook','Hombre IA 30s','INR_H11','UVT_H1','UVT_H4','UVT_H7','IA Podcast','INQUILINOS','DIV_INT'],
+    datasets:[{label:'Leads BBDD',data:[27,26,20,19,13,8,6,3,3,2],
+      backgroundColor:[bl,bl,bl,'#3B82F6','#3B82F6','#60A5FA','#60A5FA','#93C5FD','#93C5FD',mg],borderRadius:4}]
+  },
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#E5E7EB'},beginAtZero:true}}}
+});
+
+// --- Appointments por Calendario (Doughnut) ---
+new C(document.getElementById('chartApptsCal'),{
+  type:'doughnut',
+  data:{
+    labels:['Sueldo Creciente (Conf.)','Aristócratas VSL (Conf.)','Cancelados'],
+    datasets:[{data:[6,5,2],backgroundColor:[bl,gn,rd],borderWidth:0}]
+  },
+  options:{plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}},cutout:'55%'}
+});
+
+// --- Fuente de Leads (Doughnut) ---
+new C(document.getElementById('chartLeadSource'),{
+  type:'doughnut',
+  data:{
+    labels:['Facebook Ads','IG Orgánico','Directo / Otro','Google Ads','YouTube','Curso gratuito'],
+    datasets:[{data:[136,4,4,1,1,1],backgroundColor:[bl,'#60A5FA',mg,gn,yl,'#93C5FD'],borderWidth:0}]
+  },
+  options:{plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}},cutout:'55%'}
+});
+
+// --- Gasto vs Leads Diario (Line) ---
+new C(document.getElementById('chartDaily'),{
+  type:'line',
+  data:{
+    labels:['Mar 3','Mar 4','Mar 5','Mar 6','Mar 7','Mar 8'],
+    datasets:[
+      {label:'Gasto (€)',data:[337.15,319.67,267.33,239.42,195.59,194.94],
+        borderColor:dk,backgroundColor:'rgba(31,41,55,.1)',fill:true,tension:.3,yAxisID:'y',borderWidth:2,pointRadius:4},
+      {label:'Leads BBDD',data:[34,23,22,22,20,18],
+        borderColor:bl,backgroundColor:'rgba(37,99,235,.1)',fill:true,tension:.3,yAxisID:'y1',borderWidth:2,pointRadius:4}
+    ]
+  },
+  options:{plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
+    scales:{
+      y:{position:'left',title:{display:true,text:'Gasto (€)'},grid:{color:'#E5E7EB'}},
+      y1:{position:'right',title:{display:true,text:'Leads'},grid:{display:false}},
+      x:{grid:{display:false}}
+    }}
+});
+
+// --- CPL Diario (Bar) ---
+new C(document.getElementById('chartDailyCPL'),{
+  type:'bar',
+  data:{
+    labels:['Mar 3','Mar 4','Mar 5','Mar 6','Mar 7','Mar 8'],
+    datasets:[{label:'CPL Meta (€)',data:[16.86,14.53,17.82,10.88,7.82,12.18],
+      backgroundColor:['#3B82F6','#3B82F6',yl,bl,gn,bl],borderRadius:6}]
+  },
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false}},y:{grid:{color:'#E5E7EB'},ticks:{callback:v=>'€'+v},beginAtZero:true}}}
+});
+
+// --- Maturation Days (Bar) ---
+new C(document.getElementById('chartMaturation'),{
+  type:'bar',
+  data:{
+    labels:['Mismo día','1-7 días','8-14 días','15-30 días','31-60 días','61-90 días','90+ días'],
+    datasets:[{label:'Ventas',data:[59,35,47,76,22,21,85],
+      backgroundColor:[gn,gn,'#3B82F6',bl,'#60A5FA',yl,mg],borderRadius:4}]
+  },
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#E5E7EB'},beginAtZero:true}}}
+});
+
+// --- Sales by Month (Bar) ---
+new C(document.getElementById('chartSalesMonth'),{
+  type:'bar',
+  data:{
+    labels:['Enero 26','Febrero 26','Marzo 26 (parcial)'],
+    datasets:[{label:'Ventas',data:[51,133,3],
+      backgroundColor:[bl,'#3B82F6','#93C5FD'],borderRadius:6}]
+  },
+  options:{plugins:{legend:{display:false},
+    tooltip:{callbacks:{afterLabel:function(ctx){
+      if(ctx.dataIndex===1) return 'Lanzamiento';
+      if(ctx.dataIndex===2) return '9 días · Evergreen';
+      return '';
+    }}}},
+    scales:{x:{grid:{display:false}},y:{grid:{color:'#E5E7EB'},beginAtZero:true}}}
+});
+</script>
+</body>
+</html>
