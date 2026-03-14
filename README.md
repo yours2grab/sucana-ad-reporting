@@ -119,3 +119,7 @@ Copy the entire `ad-reporting/` folder into your `.claude/skills/` directory.
 
 - Claude Code CLI
 - CSV exports from any supported ad platform
+
+## Credits
+
+Built by Virgil Brewster and Victor Chasaraz at [Sucana](https://sucana.ai) — AI-powered analytics for B2B SaaS.
